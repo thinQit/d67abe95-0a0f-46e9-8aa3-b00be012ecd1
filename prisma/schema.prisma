@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  role          String   @default("buyer")
+  oauthProvider String?  @default("google")
+  passwordHash  String?
+  createdAt     DateTime @default(now())
+  listings      Listing[]
+  orders        Order[]
+  reviews       Review[]
+}
+
+model Book {
+  id              String    @id @default(cuid())
+  title           String
+  author          String
+  description     String?
+  isbn            String?   @unique
+  publisher       String?
+  publishedDate   DateTime?
+  pages           Int?
+  language        String?
+  categoryIds     String?
+  coverImageUrl   String?
+  unsplashImageId String?
+  createdAt       DateTime  @default(now())
+  listings        Listing[]
+  reviews         Review[]
+  images          Image[]
+
+  @@index([title])
+  @@index([author])
+  @@index([isbn])
+}
+
+model Listing {
+  id        String   @id @default(cuid())
+  bookId    String
+  sellerId  String
+  price     Float
+  condition String   @default("good")
+  stock     Int
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  book      Book     @relation(fields: [bookId], references: [id])
+  seller    User     @relation(fields: [sellerId], references: [id])
+  orders    Order[]
+  images    Image[]
+
+  @@index([bookId])
+  @@index([sellerId])
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  buyerId    String
+  listingId  String
+  quantity   Int
+  totalPrice Float
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  buyer      User     @relation(fields: [buyerId], references: [id])
+  listing    Listing  @relation(fields: [listingId], references: [id])
+
+  @@index([buyerId])
+  @@index([listingId])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookId     String
+  reviewerId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  book       Book     @relation(fields: [bookId], references: [id])
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+
+  @@index([bookId])
+  @@index([reviewerId])
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  source     String   @default("unsplash")
+  url        String
+  width      Int?
+  height     Int?
+  unsplashId String?
+  attribution String?
+  bookId     String?
+  listingId  String?
+  createdAt  DateTime @default(now())
+  book       Book?    @relation(fields: [bookId], references: [id])
+  listing    Listing? @relation(fields: [listingId], references: [id])
+
+  @@index([bookId])
+  @@index([listingId])
+}
