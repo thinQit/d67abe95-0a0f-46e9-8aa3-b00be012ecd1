@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Card, { CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import Spinner from '@/components/ui/Spinner';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import type { Order } from '@/types';
 
 interface OrdersResponse {
@@ -59,22 +59,13 @@ export default function ProfilePage() {
               <Card key={order.id}>
                 <CardHeader className="text-sm font-medium text-foreground">Order {order.id}</CardHeader>
                 <CardContent className="text-sm text-secondary">
-                  Status: {order.status || 'pending'} · Total: ${order.totalPrice?.toFixed(2) ?? '0.00'} ·
-                  {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
+                  <p>Status: {order.status}</p>
+                  <p>Total: ${order.totalPrice.toFixed(2)}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold text-foreground">Wishlist</h2>
-        <Card className="mt-4">
-          <CardContent className="text-sm text-secondary">
-            Your wishlist is empty. Favorite books to keep track of them here.
-          </CardContent>
-        </Card>
       </section>
     </main>
   );

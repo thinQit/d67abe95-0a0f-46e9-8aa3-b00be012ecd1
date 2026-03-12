@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
-import Card, { CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { useAuth } from '@/providers/AuthProvider';
 
 export default function SignInPage() {

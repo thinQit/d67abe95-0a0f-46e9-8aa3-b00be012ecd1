@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Card, { CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import Spinner from '@/components/ui/Spinner';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import type { Order } from '@/types';
 
 interface Summary {
@@ -64,7 +64,6 @@ export default function SellerDashboardPage() {
               </CardContent>
             </Card>
           </div>
-
           <section className="mt-8">
             <h2 className="text-xl font-semibold text-foreground">Recent orders</h2>
             {summary?.recentOrders?.length ? (
@@ -73,14 +72,15 @@ export default function SellerDashboardPage() {
                   <Card key={order.id}>
                     <CardHeader className="text-sm font-medium text-foreground">Order {order.id}</CardHeader>
                     <CardContent className="text-sm text-secondary">
-                      Status: {order.status || 'pending'} · Total: ${order.totalPrice?.toFixed(2) ?? '0.00'}
+                      <p>Status: {order.status}</p>
+                      <p>Total: ${order.totalPrice.toFixed(2)}</p>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : (
               <Card className="mt-4">
-                <CardContent className="text-sm text-secondary">No recent orders yet.</CardContent>
+                <CardContent className="text-sm text-secondary">No recent orders.</CardContent>
               </Card>
             )}
           </section>

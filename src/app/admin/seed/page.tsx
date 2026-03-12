@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
-import Card, { CardContent } from '@/components/ui/Card';
-import { api } from '@/lib/api';
+import { Card, CardContent } from '@/components/ui/Card';
+import api from '@/lib/api';
 
 export default function AdminSeedPage() {
   const [message, setMessage] = useState('');

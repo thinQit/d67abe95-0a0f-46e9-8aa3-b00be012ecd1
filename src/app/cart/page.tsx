@@ -2,9 +2,9 @@
 
 import { useState, type ChangeEvent } from 'react';
 import Button from '@/components/ui/Button';
-import Card, { CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import type { Order } from '@/types';
 
 export default function CartPage() {

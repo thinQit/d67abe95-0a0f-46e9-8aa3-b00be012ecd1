@@ -2,11 +2,10 @@
 
 import { useState, type ChangeEvent } from 'react';
 import Button from '@/components/ui/Button';
-import Card, { CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Spinner from '@/components/ui/Spinner';
-import { api } from '@/lib/api';
-import type { Image } from '@/types';
+import api from '@/lib/api';
 
 interface UnsplashResult {
   unsplashId: string;
@@ -64,26 +63,25 @@ export default function CreateListingPage() {
   const attachImage = async (result: UnsplashResult) => {
     setMessage('');
     try {
-      await api.post<{ image: Image }>('/api/images/unsplash/select', {
-        bookId: form.bookId || undefined,
+      await api.post('/api/images/unsplash/attach', {
+        bookId: form.bookId,
         unsplashId: result.unsplashId,
-        url: result.url,
-        attribution: result.attribution
+        url: result.url
       });
-      setMessage('Cover image attached to the book.');
+      setMessage('Image attached to listing.');
     } catch (_error) {
-      setMessage('Unable to attach image.');
+      setMessage('Failed to attach image.');
     }
   };
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="text-3xl font-semibold text-foreground">Create a listing</h1>
-      <p className="mt-2 text-secondary">Publish inventory with condition, pricing, and optional Unsplash imagery.</p>
+      <h1 className="text-3xl font-semibold text-foreground">Create a new listing</h1>
+      <p className="mt-2 text-secondary">Add pricing, condition, and stock before publishing.</p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_3fr]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <Card>
-          <CardHeader className="text-lg font-semibold text-foreground">Listing details</CardHeader>
+          <CardHeader className="text-sm font-medium text-secondary">Listing details</CardHeader>
           <CardContent className="space-y-4">
             <Input
               label="Book ID"
@@ -98,78 +96,55 @@ export default function CreateListingPage() {
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setForm((prev) => ({ ...prev, price: event.target.value }))
               }
-              placeholder="$18.00"
             />
-            <div className="space-y-1">
-              <label htmlFor="condition" className="text-sm font-medium text-foreground">
-                Condition
-              </label>
-              <select
-                id="condition"
-                className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
-                value={form.condition}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  setForm((prev) => ({ ...prev, condition: event.target.value }))
-                }
-              >
-                <option value="new">New</option>
-                <option value="like new">Like new</option>
-                <option value="good">Good</option>
-                <option value="fair">Fair</option>
-              </select>
-            </div>
             <Input
-              label="Stock quantity"
+              label="Condition"
+              value={form.condition}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setForm((prev) => ({ ...prev, condition: event.target.value }))
+              }
+            />
+            <Input
+              label="Stock"
               value={form.stock}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setForm((prev) => ({ ...prev, stock: event.target.value }))
               }
             />
             <Button onClick={submit} disabled={loading}>
-              {loading ? 'Creating...' : 'Create listing'}
+              {loading ? 'Saving...' : 'Create listing'}
             </Button>
             {message && <p className="text-sm text-secondary">{message}</p>}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="text-lg font-semibold text-foreground">Unsplash cover search</CardHeader>
-          <CardContent className="space-y-4">
+          <CardHeader className="text-sm font-medium text-secondary">Unsplash search</CardHeader>
+          <CardContent className="space-y-3">
             <Input
               label="Search query"
               value={searchQuery}
               onChange={(event: ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)}
-              placeholder="Search for cover imagery"
             />
             <Button variant="outline" onClick={searchUnsplash} disabled={searchLoading}>
-              {searchLoading ? 'Searching...' : 'Search Unsplash'}
+              {searchLoading ? 'Searching...' : 'Search images'}
             </Button>
             {searchLoading && (
               <div className="flex items-center gap-2 text-sm text-secondary">
-                <Spinner className="h-4 w-4" />
-                Searching imagery...
+                <Spinner className="h-4 w-4" /> Loading results...
               </div>
             )}
-            {searchError && <p className="text-sm text-secondary">{searchError}</p>}
-            {results.length === 0 && !searchLoading ? (
-              <p className="text-sm text-secondary">No results yet. Try a search query.</p>
-            ) : (
-              <div className="space-y-3">
-                {results.map((result) => (
-                  <Card key={result.unsplashId} className="border border-border">
-                    <CardContent className="space-y-2">
-                      <div className="text-sm font-medium text-foreground">Unsplash image</div>
-                      <p className="text-xs text-secondary">
-                        Attribution: {result.attribution || 'Unsplash contributor'}
-                      </p>
-                      <Button size="sm" onClick={() => attachImage(result)}>
-                        Attach to book
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            {searchError && <p className="text-sm text-destructive">{searchError}</p>}
+            <div className="grid gap-3">
+              {results.map((result) => (
+                <div key={result.unsplashId} className="rounded-md border border-border p-3">
+                  <p className="text-xs text-secondary">{result.attribution || 'Unsplash image'}</p>
+                  <Button size="sm" className="mt-2" onClick={() => attachImage(result)}>
+                    Attach image
+                  </Button>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
