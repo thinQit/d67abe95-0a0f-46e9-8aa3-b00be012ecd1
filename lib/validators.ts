@@ -1,59 +1,47 @@
 import { z } from "zod";
 
-export const bookListQuerySchema = z.object({
-  search: z.string().optional(),
-  genre: z.string().optional(),
-  featured: z.coerce.boolean().optional(),
-  inStock: z.coerce.boolean().optional(),
-  sort: z.enum(["featured", "created_desc", "price_asc", "price_desc", "rating_desc"]).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(12),
+export const adminBookCreateSchema = z
+  .object({
+    title: z.string().min(1),
+    author: z.string().min(1),
+    description: z.string().min(1),
+    price: z.coerce.number().nonnegative(),
+    slug: z.string().min(1).optional(),
+    stock: z.coerce.number().int().nonnegative().optional(),
+    genreId: z.string().optional(),
+    imageUrl: z.string().url().optional(),
+    featured: z.boolean().optional(),
+  })
+  .passthrough();
+
+export const adminBookUpdateSchema = adminBookCreateSchema.partial();
+
+export const adminOrdersQuerySchema = z.object({
+  status: z.string().optional(),
+  customerEmail: z.string().email().optional(),
+  take: z.coerce.number().int().min(1).max(100).default(20),
+  cursor: z.string().optional(),
 });
 
-export const addCartItemSchema = z.object({
-  bookId: z.string().cuid(),
-  quantity: z.number().int().min(1).max(99),
+export const cartMergeSchema = z.object({
+  items: z.array(
+    z.object({
+      bookId: z.string().min(1),
+      quantity: z.coerce.number().int().min(1),
+    })
+  ),
 });
 
-export const updateCartItemSchema = z.object({
-  quantity: z.number().int().min(1).max(99),
-});
-
-export const checkoutSchema = z.object({
-  fullName: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  addressLine1: z.string().min(3),
-  addressLine2: z.string().optional(),
-  city: z.string().min(2),
-  state: z.string().min(2),
-  postalCode: z.string().min(2),
-  country: z.string().min(2),
-});
-
-export const adminCreateBookSchema = z.object({
-  title: z.string().min(2),
-  slug: z.string().min(2),
-  author: z.string().min(2),
-  description: z.string().min(10),
-  price: z.number().nonnegative(),
-  rating: z.number().min(0).max(5).optional(),
-  reviewCount: z.number().int().nonnegative().optional(),
-  stock: z.number().int().nonnegative(),
-  featured: z.boolean().optional(),
-  coverUrl: z.string().url().optional(),
-  isbn: z.string().optional(),
-  format: z.string().optional(),
-  pages: z.number().int().positive().optional(),
-  publisher: z.string().optional(),
-  publicationDate: z.string().datetime().optional(),
-  language: z.string().optional(),
-  genreName: z.string().min(2),
-});
-
-export const adminUpdateBookSchema = adminCreateBookSchema.partial();
-
-export const adminOrderUpdateSchema = z.object({
-  status: z.enum(["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]).optional(),
-  trackingNumber: z.string().optional(),
-});
+export const createOrderSchema = z
+  .object({
+    shippingName: z.string().optional(),
+    shippingEmail: z.string().email().optional(),
+    shippingPhone: z.string().optional(),
+    shippingAddress: z.string().optional(),
+    shippingCity: z.string().optional(),
+    shippingState: z.string().optional(),
+    shippingPostalCode: z.string().optional(),
+    shippingCountry: z.string().optional(),
+    notes: z.string().optional(),
+  })
+  .passthrough();
