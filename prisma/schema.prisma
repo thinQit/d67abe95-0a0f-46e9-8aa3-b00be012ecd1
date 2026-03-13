@@ -3,112 +3,185 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?  @unique
-  role          String   @default("buyer")
-  oauthProvider String?  @default("google")
-  passwordHash  String?
-  createdAt     DateTime @default(now())
-  listings      Listing[]
-  orders        Order[]
-  reviews       Review[]
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(CUSTOMER)
+
+  accounts Account[]
+  sessions Session[]
+  cart     Cart?
+  orders   Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Book {
-  id              String    @id @default(cuid())
-  title           String
-  author          String
-  description     String?
-  isbn            String?   @unique
-  publisher       String?
-  publishedDate   DateTime?
-  pages           Int?
-  language        String?
-  categoryIds     String?
-  coverImageUrl   String?
-  unsplashImageId String?
-  createdAt       DateTime  @default(now())
-  listings        Listing[]
-  reviews         Review[]
-  images          Image[]
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  author      String
+  genre       String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  coverImage  String?
+  format      String?
+  pages       Int?
+  language    String?
+  publisher   String?
+  isbn13      String?  @unique
 
-  @@index([title])
-  @@index([author])
-  @@index([isbn])
-}
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
 
-model Listing {
-  id        String   @id @default(cuid())
-  bookId    String
-  sellerId  String
-  price     Float
-  condition String   @default("good")
-  stock     Int
-  status    String   @default("active")
   createdAt DateTime @default(now())
-  book      Book     @relation(fields: [bookId], references: [id])
-  seller    User     @relation(fields: [sellerId], references: [id])
-  orders    Order[]
-  images    Image[]
-
-  @@index([bookId])
-  @@index([sellerId])
-}
-
-model Order {
-  id         String   @id @default(cuid())
-  buyerId    String
-  listingId  String
-  quantity   Int
-  totalPrice Float
-  status     String   @default("pending")
-  createdAt  DateTime @default(now())
-  buyer      User     @relation(fields: [buyerId], references: [id])
-  listing    Listing  @relation(fields: [listingId], references: [id])
-
-  @@index([buyerId])
-  @@index([listingId])
+  updatedAt DateTime @updatedAt
 }
 
 model Review {
-  id         String   @id @default(cuid())
-  bookId     String
-  reviewerId String
-  rating     Int
-  comment    String?
-  createdAt  DateTime @default(now())
-  book       Book     @relation(fields: [bookId], references: [id])
-  reviewer   User     @relation(fields: [reviewerId], references: [id])
+  id       String @id @default(cuid())
+  bookId   String
+  name     String
+  rating   Int
+  quote    String
 
-  @@index([bookId])
-  @@index([reviewerId])
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
-model Category {
-  id   String @id @default(cuid())
-  name String @unique
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Image {
-  id         String   @id @default(cuid())
-  source     String   @default("unsplash")
-  url        String
-  width      Int?
-  height     Int?
-  unsplashId String?
-  attribution String?
-  bookId     String?
-  listingId  String?
-  createdAt  DateTime @default(now())
-  book       Book?    @relation(fields: [bookId], references: [id])
-  listing    Listing? @relation(fields: [listingId], references: [id])
+model CartItem {
+  id       String @id @default(cuid())
+  cartId   String
+  bookId   String
+  quantity Int
 
-  @@index([bookId])
-  @@index([listingId])
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, bookId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  userId      String
+  status      OrderStatus @default(PENDING)
+  subtotal    Decimal     @db.Decimal(10, 2)
+  tax         Decimal     @db.Decimal(10, 2)
+  shipping    Decimal     @db.Decimal(10, 2)
+  total       Decimal     @db.Decimal(10, 2)
+
+  shippingName      String
+  shippingEmail     String
+  shippingAddress1  String
+  shippingAddress2  String?
+  shippingCity      String
+  shippingState     String
+  shippingPostal    String
+  shippingCountry   String
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  bookId    String
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  title     String
+  author    String
+  genre     String
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscription {
+  id    String @id @default(cuid())
+  email String @unique
+
+  createdAt DateTime @default(now())
 }
