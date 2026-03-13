@@ -16,41 +16,46 @@ interface GalleryMasonryProps {
 }
 
 export default function GalleryMasonry({
-  headline = "Shop the Look",
-  subheadline = "Explore best-selling products and customer favorites.",
-  images = [
-    {
-      url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577126/site-images/ecommerce/16675636.jpg",
-      alt: "Featured ecommerce product collection",
-      caption: "New season essentials",
-    },
-    {
-      url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577105/site-images/ecommerce/17485352.jpg",
-      alt: "Lifestyle product display",
-      caption: "Minimalist everyday picks",
-    },
-    {
-      url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577128/site-images/ecommerce/32831065.jpg",
-      alt: "Online store curated products",
-      caption: "Top-rated bundles",
-    },
-  ],
+  headline = "Shop by style",
+  subheadline = "Explore best-sellers and new arrivals customers are loving this season.",
+  images = [],
 }: Partial<GalleryMasonryProps>) {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
+  const safeImages =
+    images.length > 0
+      ? images
+      : [
+          {
+            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577110/site-images/ecommerce/17485351.jpg",
+            alt: "Featured fashion picks",
+            caption: "New Season Collection",
+          },
+          {
+            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577111/site-images/ecommerce/3767397.jpg",
+            alt: "Accessories and essentials",
+            caption: "Everyday Essentials",
+          },
+          {
+            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577164/site-images/ecommerce/11952301.jpg",
+            alt: "Modern ecommerce lifestyle",
+            caption: "Top Rated Picks",
+          },
+        ];
+
   return (
-    <section className="py-16 md:py-20">
-      <div className="container mx-auto max-w-7xl px-4 animate-fade-in-up">
-        <div className="mx-auto max-w-2xl text-center">
+    <section className="py-20 md:py-28 bg-background">
+      <div className="container mx-auto max-w-7xl px-4">
+        <div className="animate-fade-in-up mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{headline}</h2>
           {subheadline && <p className="mt-4 text-lg text-muted-foreground">{subheadline}</p>}
         </div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {images.map(function (img, i) {
+          {safeImages.map(function (img, i) {
             return (
               <div
                 key={i}
-                className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl card-hover"
+                className="group card-hover relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-border bg-card"
                 onClick={function () {
                   setSelectedImage(img);
                 }}
@@ -58,9 +63,10 @@ export default function GalleryMasonry({
                 <Image
                   src={img.url}
                   alt={img.alt}
-                  fill
+                  width={800}
+                  height={800}
                   unoptimized
-                  className="object-cover transition-transform duration-500 hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-foreground/0 transition-all group-hover:bg-foreground/30" />
                 {img.caption && (
@@ -79,9 +85,14 @@ export default function GalleryMasonry({
               setSelectedImage(null);
             }}
           >
-            <div className="relative h-[85vh] w-[90vw]">
-              <Image src={selectedImage.url} alt={selectedImage.alt} fill unoptimized className="rounded-lg object-contain" />
-            </div>
+            <Image
+              src={selectedImage.url}
+              alt={selectedImage.alt}
+              width={1400}
+              height={1000}
+              unoptimized
+              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+            />
           </div>
         )}
       </div>

@@ -7,33 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  CUSTOMER
-  ADMIN
-}
-
 enum OrderStatus {
-  PENDING
-  PAID
-  FULFILLED
-  CANCELLED
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
-  role          UserRole  @default(CUSTOMER)
-
-  accounts Account[]
-  sessions Session[]
-  cart     Cart?
-  orders   Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role          String         @default("customer")
+  accounts      Account[]
+  sessions      Session[]
+  cart          Cart?
+  orders        Order[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Account {
@@ -42,12 +36,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -60,8 +54,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -72,116 +65,117 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Book {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  author      String
-  genre       String
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  stock       Int      @default(0)
-  featured    Boolean  @default(false)
-  rating      Float    @default(0)
-  reviewCount Int      @default(0)
-  coverImage  String?
-  format      String?
-  pages       Int?
-  language    String?
-  publisher   String?
-  isbn13      String?  @unique
-
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  reviews    Review[]
-
+model Genre {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  slug      String  @unique
+  books     Book[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Review {
-  id       String @id @default(cuid())
-  bookId   String
-  name     String
-  rating   Int
-  quote    String
+model Book {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  author          String
+  description     String   @db.Text
+  price           Decimal  @db.Decimal(10, 2)
+  rating          Decimal  @db.Decimal(3, 2) @default(0)
+  reviewCount     Int      @default(0)
+  stock           Int      @default(0)
+  featured        Boolean  @default(false)
+  coverUrl        String?
+  isbn            String?
+  format          String?
+  pages           Int?
+  publisher       String?
+  publicationDate DateTime?
+  language        String?
+  archived        Boolean  @default(false)
+  genreId         String
+  genre           Genre    @relation(fields: [genreId], references: [id])
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
+  @@index([genreId])
+  @@index([featured])
+  @@index([archived])
 }
 
 model Cart {
-  id     String @id @default(cuid())
-  userId String @unique
-
-  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items CartItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String     @id @default(cuid())
+  userId    String?    @unique
+  guestId   String?    @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model CartItem {
-  id       String @id @default(cuid())
-  cartId   String
-  bookId   String
-  quantity Int
-
-  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  book Book @relation(fields: [bookId], references: [id], onDelete: Restrict)
-
+  id        String   @id @default(cuid())
+  cartId    String
+  bookId    String
+  quantity  Int
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Restrict)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([cartId, bookId])
+  @@index([cartId])
+  @@index([bookId])
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  orderNumber String      @unique
-  userId      String
-  status      OrderStatus @default(PENDING)
-  subtotal    Decimal     @db.Decimal(10, 2)
-  tax         Decimal     @db.Decimal(10, 2)
-  shipping    Decimal     @db.Decimal(10, 2)
-  total       Decimal     @db.Decimal(10, 2)
-
-  shippingName      String
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique
+  userId            String
+  status            OrderStatus @default(Pending)
+  trackingNumber    String?
+  shippingFullName  String
   shippingEmail     String
+  shippingPhone     String?
   shippingAddress1  String
   shippingAddress2  String?
   shippingCity      String
   shippingState     String
   shippingPostal    String
   shippingCountry   String
+  subtotal          Decimal     @db.Decimal(10, 2)
+  shippingAmount    Decimal     @db.Decimal(10, 2)
+  taxAmount         Decimal     @db.Decimal(10, 2)
+  totalAmount       Decimal     @db.Decimal(10, 2)
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
-  user  User        @relation(fields: [userId], references: [id], onDelete: Restrict)
-  items OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([userId, createdAt])
+  @@index([status])
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   orderId   String
   bookId    String
-  quantity  Int
-  unitPrice Decimal @db.Decimal(10, 2)
   title     String
   author    String
-  genre     String
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  book  Book  @relation(fields: [bookId], references: [id], onDelete: Restrict)
-
+  unitPrice Decimal  @db.Decimal(10, 2)
+  quantity  Int
+  lineTotal Decimal  @db.Decimal(10, 2)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Restrict)
   createdAt DateTime @default(now())
+
+  @@index([orderId])
 }
 
-model NewsletterSubscription {
-  id    String @id @default(cuid())
-  email String @unique
-
-  createdAt DateTime @default(now())
+model NewsletterSubscriber {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  createdAt  DateTime @default(now())
 }

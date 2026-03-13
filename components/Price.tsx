@@ -3,19 +3,31 @@
 import { cn } from '@/lib/utils'
 
 interface PriceProps {
-  value?: number
+  amount?: number
   currency?: string
+  compareAt?: number
   className?: string
 }
 
 export default function Price({
-  value = 0,
+  amount = 0,
   currency = 'USD',
+  compareAt = 0,
   className = '',
 }: Partial<PriceProps>) {
+  const fmt = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  })
+
   return (
-    <span className={cn('font-bold text-[#1A1A2E]', className)}>
-      {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value)}
-    </span>
+    <div className={cn('flex items-center gap-2', className)}>
+      <span className="text-lg font-bold text-[#1A1A2E]">{fmt.format(amount)}</span>
+      {compareAt > amount ? (
+        <span className="text-sm text-muted-foreground line-through">
+          {fmt.format(compareAt)}
+        </span>
+      ) : null}
+    </div>
   )
 }

@@ -1,38 +1,52 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Input } from '@/components/ui/input'
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 
 interface SearchBarProps {
-  placeholder?: string
-  debounceMs?: number
+  placeholder?: string;
 }
 
 export default function SearchBar({
-  placeholder = 'Search by title or author...',
-  debounceMs = 350,
-}: Partial<SearchBarProps>) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const params = useSearchParams()
-  const [value, setValue] = useState(params.get('q') ?? '')
+  placeholder = "Search titles, authors…",
+}: SearchBarProps) {
+  const [value, setValue] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      const next = new URLSearchParams(params.toString())
-      if (value) next.set('q', value)
-      else next.delete('q')
-      router.replace(pathname + '?' + next.toString())
-    }, debounceMs)
-    return () => clearTimeout(t)
-  }, [value, debounceMs, pathname, params, router])
+    const param = searchParams.get("search") || "";
+    setValue(param);
+  }, [searchParams.get("search")]);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setValue(e.target.value);
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    if (e.target.value) {
+      params.set("search", e.target.value);
+    } else {
+      params.delete("search");
+    }
+    router.replace(`/catalog?${params.toString()}`, { scroll: false });
+  }
 
   return (
-    <div className="relative w-full">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-      <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} className="pl-9" />
-    </div>
-  )
+    <label className="relative block">
+      <span className="sr-only">Search books</span>
+      <input
+        className={cn(
+          "w-full py-2 px-4 pl-10 rounded-lg border border-border bg-card text-base shadow-inner focus:ring-1 focus:ring-primary transition"
+        )}
+        type="search"
+        placeholder={placeholder}
+        value={value}
+        onChange={handleChange}
+        autoComplete="off"
+        aria-label={placeholder}
+      />
+      <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+    </label>
+  );
 }

@@ -13,22 +13,24 @@ interface StatsCounterProps {
 }
 
 export default function StatsCounter({
-  stats = [
-    { value: "50K+", label: "Orders Delivered" },
-    { value: "98%", label: "Customer Satisfaction" },
-    { value: "24/7", label: "Support Coverage" },
-    { value: "1,200+", label: "Top-Rated Products" },
-  ],
+  stats = [],
   bgColor = "bg-primary text-primary-foreground",
 }: Partial<StatsCounterProps>) {
-  const cols = Math.min(stats.length || 2, 4);
-  const colClass = cols === 1 ? "md:grid-cols-1" : cols === 2 ? "md:grid-cols-2" : cols === 3 ? "md:grid-cols-3" : "md:grid-cols-4";
+  const safeStats =
+    stats.length > 0
+      ? stats
+      : [
+          { value: "120K+", label: "Orders Delivered" },
+          { value: "45K+", label: "Happy Customers" },
+          { value: "2,500+", label: "Products Available" },
+          { value: "4.9/5", label: "Average Rating" },
+        ];
 
   return (
-    <section className={`py-16 md:py-20 ${bgColor}`}>
-      <div className="container mx-auto max-w-7xl px-4 animate-fade-in-up">
-        <div className={`grid gap-4 md:gap-6 text-center grid-cols-2 ${colClass}`}>
-          {stats.map(function (stat, i) {
+    <section className={`py-16 ${bgColor}`}>
+      <div className="container mx-auto max-w-7xl px-4">
+        <div className="animate-fade-in-up grid gap-8 text-center grid-cols-2 md:grid-cols-4">
+          {safeStats.map(function (stat, i) {
             return (
               <div key={i}>
                 <p className="text-4xl font-bold md:text-5xl">{stat.value}</p>

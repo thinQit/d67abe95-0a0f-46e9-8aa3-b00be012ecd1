@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { BadgeCheck, Globe, Shield, Sparkles, Star, Truck, Zap } from "lucide-react";
+import { BadgeCheck, Globe, Shield, Sparkles, Star, Truck, Zap, BookOpen, FileText } from 'lucide-react';
 
 interface Feature {
   icon: string;
@@ -17,7 +17,7 @@ interface FeaturesGridProps {
   features: Feature[];
 }
 
-const iconMap: Record<string, React.ElementType> = {
+const iconMap: Record<string, React.ElementType> = { BookOpen, FileText, 
   Sparkles,
   Globe,
   Shield,
@@ -29,30 +29,54 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function FeaturesGrid({
   badge = "Why shoppers choose us",
-  headline = "Built for fast, confident online shopping",
-  subheadline = "From secure checkout to lightning delivery, every feature is designed to help customers buy with trust.",
-  features = [
-    { icon: "Shield", title: "Secure Checkout", description: "PCI-safe payments and encrypted transactions on every order." },
-    { icon: "Truck", title: "Fast Fulfillment", description: "Quick shipping windows with real-time tracking from cart to door." },
-    { icon: "Sparkles", title: "Curated Quality", description: "Handpicked products with strict quality standards and reviews." },
-  ],
+  headline = "Built for a faster, safer shopping experience",
+  subheadline = "From secure checkout to rapid delivery, every feature is designed to increase trust and conversions.",
+  features = [],
 }: Partial<FeaturesGridProps>) {
+  const safeFeatures =
+    features.length > 0
+      ? features
+      : [
+          {
+            icon: "Shield",
+            title: "Secure Payments",
+            description: "Protected checkout with trusted payment gateways and fraud monitoring.",
+          },
+          {
+            icon: "Truck",
+            title: "Fast Fulfillment",
+            description: "Quick order processing and dependable shipping with real-time tracking.",
+          },
+          {
+            icon: "Sparkles",
+            title: "Curated Quality",
+            description: "Handpicked products with quality checks so customers buy with confidence.",
+          },
+        ];
+
   return (
-    <section className="py-16 md:py-20 bg-muted/50">
-      <div className="container mx-auto max-w-7xl px-4 animate-fade-in-up">
-        <div className="mx-auto max-w-2xl text-center">
-          {badge && <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-primary">{badge}</span>}
+    <section className="py-20 md:py-28 bg-muted/50">
+      <div className="container mx-auto max-w-7xl px-4">
+        <div className="animate-fade-in-up mx-auto max-w-2xl text-center">
+          {badge && (
+            <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-primary">
+              {badge}
+            </span>
+          )}
           <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{headline}</h2>
           {subheadline && <p className="mt-4 text-lg text-muted-foreground">{subheadline}</p>}
         </div>
-        <div className="mt-16 grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {features.map(function (feature, index) {
-            const Icon = iconMap[feature.icon] || Sparkles;
+        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {safeFeatures.map(function (feature, index) {
+            const IconComponent = iconMap[feature.icon] || Sparkles;
             return (
-              <Card key={index} className="rounded-xl border bg-card shadow-sm hover:shadow-md transition-shadow card-hover">
+              <Card
+                key={index}
+                className="card-hover border border-border bg-card text-card-foreground shadow-sm transition-all duration-200"
+              >
                 <CardContent className="p-6">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    {React.createElement(Icon, { className: "h-6 w-6" })}
+                    {React.createElement(IconComponent, { className: "h-6 w-6" })}
                   </div>
                   <h3 className="text-xl font-semibold text-foreground">{feature.title}</h3>
                   <p className="mt-2 text-muted-foreground">{feature.description}</p>

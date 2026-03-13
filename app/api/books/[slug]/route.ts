@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-export async function GET(_: NextRequest, { params }: { params: { slug: string } }) {
+type Ctx = { params: { slug: string } };
+
+export async function GET(_req: NextRequest, { params }: Ctx) {
   try {
-    const book = await db.book.findUnique({
-      where: { slug: params.slug },
-      include: { reviews: true },
+    const book = await db.book.findFirst({
+      where: { slug: params.slug, archived: false },
+      include: { genre: true },
     });
 
-    if (!book) {
-      return NextResponse.json({ error: "Book not found" }, { status: 404 });
-    }
+    if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
 
     return NextResponse.json(book);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch book" }, { status: 500 });
   }
 }
