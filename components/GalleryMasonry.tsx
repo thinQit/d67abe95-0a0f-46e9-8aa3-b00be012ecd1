@@ -16,46 +16,25 @@ interface GalleryMasonryProps {
 }
 
 export default function GalleryMasonry({
-  headline = "Shop by style",
-  subheadline = "Explore best-sellers and new arrivals customers are loving this season.",
+  headline = "Shop the Collection",
+  subheadline = "Explore best-selling styles curated for modern everyday living.",
   images = [],
 }: Partial<GalleryMasonryProps>) {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
-  const safeImages =
-    images.length > 0
-      ? images
-      : [
-          {
-            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577110/site-images/ecommerce/17485351.jpg",
-            alt: "Featured fashion picks",
-            caption: "New Season Collection",
-          },
-          {
-            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577111/site-images/ecommerce/3767397.jpg",
-            alt: "Accessories and essentials",
-            caption: "Everyday Essentials",
-          },
-          {
-            url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577164/site-images/ecommerce/11952301.jpg",
-            alt: "Modern ecommerce lifestyle",
-            caption: "Top Rated Picks",
-          },
-        ];
-
   return (
-    <section className="py-20 md:py-28 bg-background">
+    <section className="py-20 md:py-28">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="animate-fade-in-up mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{headline}</h2>
           {subheadline && <p className="mt-4 text-lg text-muted-foreground">{subheadline}</p>}
         </div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {safeImages.map(function (img, i) {
+          {images.map(function (img, i) {
             return (
               <div
                 key={i}
-                className="group card-hover relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-border bg-card"
+                className="card-hover group relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-border bg-card"
                 onClick={function () {
                   setSelectedImage(img);
                 }}
@@ -88,8 +67,8 @@ export default function GalleryMasonry({
             <Image
               src={selectedImage.url}
               alt={selectedImage.alt}
-              width={1400}
-              height={1000}
+              width={1200}
+              height={900}
               unoptimized
               className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
             />

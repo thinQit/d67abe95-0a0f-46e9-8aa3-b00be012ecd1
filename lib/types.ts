@@ -1,18 +1,27 @@
-export type CurrencyCode = "USD";
-
-export type StockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
-
-export type OrderStatus = "PENDING" | "PAID" | "FULFILLED" | "CANCELLED";
-
 export interface NavItem {
   label: string;
   href: string;
 }
 
-export interface Genre {
+export interface CTA {
+  label: string;
+  href: string;
+}
+
+export interface SectionBase {
+  id: string;
+  type: string;
+  headline: string;
+  subheadline?: string;
+  primaryCta?: CTA;
+  secondaryCta?: CTA;
+  content?: Record<string, unknown>;
+}
+
+export interface PageConfig {
+  path: string;
   name: string;
-  href?: string;
-  description?: string;
+  sections: SectionBase[];
 }
 
 export interface Book {
@@ -21,16 +30,13 @@ export interface Book {
   title: string;
   author: string;
   genre: string;
-  description?: string;
-  coverImage: string;
   price: number;
-  currency: CurrencyCode;
+  compareAtPrice?: number;
   rating: number;
   reviewCount: number;
-  featured: boolean;
   stock: number;
-  stockStatus: StockStatus;
-  isbn13?: string;
+  featured?: boolean;
+  coverUrl?: string;
 }
 
 export interface CartItem {
@@ -38,52 +44,17 @@ export interface CartItem {
   bookId: string;
   title: string;
   slug: string;
-  coverImage: string;
   price: number;
-  currency: CurrencyCode;
   quantity: number;
   stock: number;
-}
-
-export interface Cart {
-  id: string;
-  items: CartItem[];
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
-}
-
-export interface OrderLineItem {
-  id: string;
-  bookId: string;
-  title: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
-
-export interface Address {
-  fullName: string;
-  email: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  stateRegion: string;
-  postalCode: string;
-  country: string;
+  coverUrl?: string;
 }
 
 export interface Order {
   id: string;
   orderNumber: string;
-  status: OrderStatus;
-  items: OrderLineItem[];
-  subtotal: number;
-  shipping: number;
-  tax: number;
+  status: "pending" | "paid" | "fulfilled" | "cancelled";
   total: number;
-  shippingAddress: Address;
   createdAt: string;
-  updatedAt: string;
+  items: CartItem[];
 }

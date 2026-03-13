@@ -4,12 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com"
-      }
-    ]
-  }
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
+  // ENFORCE TypeScript and ESLint errors during build!
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
 };
 
-nextConfig.typescript = Object.assign(nextConfig.typescript || {}, { ignoreBuildErrors: true });
-nextConfig.eslint = Object.assign(nextConfig.eslint || {}, { ignoreDuringBuilds: true });
 module.exports = nextConfig;

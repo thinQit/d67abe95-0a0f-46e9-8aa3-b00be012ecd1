@@ -1,65 +1,49 @@
-'use client'
+"use client";
 
-import ProductCard from '@/components/ProductCard'
-import EmptyState from '@/components/EmptyState'
+import ProductCard from "@/components/ProductCard";
 
-interface Product {
-  id: string
-  title: string
-  author: string
-  rating: number
-  price: number
-  stock: number
-  imageSrc: string
+export interface Product {
+  slug: string;
+  title: string;
+  author: string;
+  genre: string;
+  price: number;
+  compareAtPrice?: number;
+  rating: number;
+  reviewCount: number;
+  badge?: string;
+  imageUrl?: string;
 }
 
 interface ProductGridProps {
-  products?: Product[]
-  loading?: boolean
-  page?: number
-  totalPages?: number
-  onPageChange?: (page: number) => void
-  onAddToCart?: (id: string) => void
+  headline?: string;
+  subheadline?: string;
+  products: Product[];
 }
 
 export default function ProductGrid({
+  headline = "Books you’ll love",
+  subheadline,
   products = [],
-  loading = false,
-  page = 1,
-  totalPages = 1,
-  onPageChange = () => {},
-  onAddToCart = () => {},
 }: Partial<ProductGridProps>) {
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-80 animate-pulse rounded-xl bg-muted" />
-        ))}
-      </div>
-    )
-  }
-
-  if (!products.length) {
-    return <EmptyState title="No books found" message="Try a different genre or search term." />
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} {...product} onAddToCart={onAddToCart} />
-        ))}
+    <section className="py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-4">
+        {headline && (
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">{headline}</h2>
+        )}
+        {subheadline && (
+          <p className="mb-6 text-lg text-muted-foreground">{subheadline}</p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {products.map((p) => (
+            <ProductCard key={p.slug} {...p} />
+          ))}
+        </div>
       </div>
-      <div className="flex items-center justify-center gap-2">
-        <button className="rounded border px-3 py-1 text-sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-          Prev
-        </button>
-        <span className="text-sm">Page {page} of {totalPages}</span>
-        <button className="rounded border px-3 py-1 text-sm" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
-          Next
-        </button>
-      </div>
-    </div>
-  )
+    </section>
+  );
 }
+
+// NOTE: ProductCard component must exist in "@/components/ProductCard.tsx"
+// with a full implementation. If not, create it.

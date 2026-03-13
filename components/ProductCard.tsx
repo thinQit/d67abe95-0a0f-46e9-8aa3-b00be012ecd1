@@ -1,56 +1,128 @@
-'use client'
+'use client';
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingCart, Eye } from "lucide-react";
+import PriceTag from "@/components/PriceTag";
+import RatingStars from "@/components/RatingStars";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-import Image from 'next/image'
-import { Star } from 'lucide-react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import Price from '@/components/Price'
-import StatusBadge from '@/components/StatusBadge'
-
-interface ProductCardProps {
-  id?: string
-  title?: string
-  author?: string
-  rating?: number
-  price?: number
-  stock?: number
-  imageSrc?: string
-  onAddToCart?: (id: string) => void
-  className?: string
+export interface ProductCardProps {
+  slug: string;
+  title: string;
+  author: string;
+  genre: string;
+  price: number;
+  compareAtPrice?: number;
+  rating: number;
+  reviewCount: number;
+  badge?: string;
+  imageUrl?: string;
+  stock?: number;
+  onAddToCart?: () => void;
+  onQuickView?: () => void;
 }
 
 export default function ProductCard({
-  id = 'book-1',
-  title = 'The Midnight Library',
-  author = 'Matt Haig',
-  rating = 4.7,
-  price = 16.99,
+  slug,
+  title,
+  author,
+  genre,
+  price,
+  compareAtPrice,
+  rating,
+  reviewCount,
+  badge,
+  imageUrl,
   stock = 12,
-  imageSrc = 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577126/site-images/ecommerce/16675636.jpg',
-  onAddToCart = () => {},
-  className = '',
-}: Partial<ProductCardProps>) {
+  onAddToCart,
+  onQuickView,
+}: ProductCardProps) {
+  const inStock = stock > 0;
+
   return (
-    <Card className={cn('overflow-hidden rounded-xl border bg-white', className)}>
-      <div className="relative aspect-[3/4]">
-        <Image src={imageSrc} alt={title} fill width={600} height={800} className="object-cover" unoptimized />
-      </div>
-      <div className="space-y-2 p-4">
-        <h3 className="line-clamp-1 font-semibold">{title}</h3>
-        <p className="text-sm text-muted-foreground">{author}</p>
-        <div className="flex items-center gap-1 text-sm">
-          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          {rating.toFixed(1)}
+    <article
+      className={cn(
+        "card-hover group relative flex flex-col items-stretch rounded-xl border bg-card p-3 shadow-sm transition-shadow hover:shadow-md",
+        !inStock && "opacity-70 pointer-events-none"
+      )}
+      tabIndex={0}
+      aria-label={`View details for ${title} by ${author}`}
+    >
+      <Link href={`/book/${slug}`} tabIndex={-1}>
+        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-muted">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={`Book cover: ${title} by ${author}`}
+              width={420}
+              height={560}
+              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+              style={{ aspectRatio: "3/4" }}
+              priority={false}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              <span className="font-medium text-lg">No cover</span>
+            </div>
+          )}
+          {badge && (
+            <span className="absolute left-2 top-2 z-10 rounded bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground shadow">
+              {badge}
+            </span>
+          )}
+          {!inStock && (
+            <span className="absolute bottom-2 right-2 z-10 rounded bg-destructive px-2 py-0.5 text-xs font-semibold text-white shadow">
+              Out of stock
+            </span>
+          )}
         </div>
-        <div className="flex items-center justify-between">
-          <Price value={price} />
-          <StatusBadge type={stock > 0 ? 'in-stock' : 'out-of-stock'} />
+      </Link>
+      <div className="flex flex-1 flex-col justify-between gap-3 mt-4">
+        <Link href={`/book/${slug}`}>
+          <h3 className="line-clamp-2 text-lg font-bold text-foreground transition group-hover:text-primary">
+            {title}
+          </h3>
+        </Link>
+        <p className="text-sm text-muted-foreground mt-1">
+          by <span className="font-medium">{author}</span>
+        </p>
+        <div className="my-2">
+          <PriceTag price={price} compareAtPrice={compareAtPrice} />
         </div>
-        <Button className="w-full bg-[#E63946] hover:bg-[#d9333f]" disabled={stock <= 0} onClick={() => onAddToCart(id)}>
-          Quick Add
-        </Button>
+        <div className="flex items-center gap-2">
+          <RatingStars rating={rating} count={reviewCount} />
+        </div>
+        <div className="flex gap-2 mt-4">
+          <Button
+            size="sm"
+            variant="default"
+            className="w-full"
+            aria-label={inStock ? "Add to cart" : "Out of stock"}
+            onClick={(e) => {
+              if (inStock) onAddToCart?.();
+              e.stopPropagation();
+            }}
+            disabled={!inStock}
+          >
+            <ShoppingCart className="h-4 w-4 mr-1.5" />
+            Add to cart
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full"
+            aria-label="Quick view"
+            onClick={(e) => {
+              onQuickView?.();
+              e.stopPropagation();
+            }}
+          >
+            <Eye className="h-4 w-4 mr-1.5" />
+            Quick view
+          </Button>
+        </div>
       </div>
-    </Card>
-  )
+    </article>
+  );
 }

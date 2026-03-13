@@ -1,26 +1,17 @@
-import "./globals.css"
-import type { Metadata } from "next"
-import { DM_Sans, Inter } from "next/font/google"
-import SiteHeader from "@/components/SiteHeader"
-import SiteFooter from "@/components/SiteFooter"
+import './globals.css'
+import { DM_Sans, Inter } from 'next/font/google'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  weight: ["400", "500", "700"],
+  subsets: ['latin'],
+  variable: '--font-heading',
 })
 
 const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["300", "400", "600"],
+  subsets: ['latin'],
+  variable: '--font-body',
 })
-
-export const metadata: Metadata = {
-  title: "BookShop — Modern Bookstore with Genre Browsing, Cart & Admin Inventory",
-  description:
-    "Browse seeded books, search by title, filter by genre, add to cart, sign in with Google, and manage inventory and orders via an admin dashboard.",
-}
 
 export default function RootLayout({
   children,
@@ -29,50 +20,51 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${inter.variable} font-sans bg-background text-foreground`}>
-        <SiteHeader
+      <body className={`${dmSans.variable} ${inter.variable} bg-background text-foreground antialiased`}>
+        <Navbar
           logo="BookShop"
           navItems={[
-            { label: "Home", href: "/" },
-            { label: "Catalog", href: "/catalog" },
-            { label: "Cart", href: "/cart" },
-            { label: "Orders", href: "/account/orders" },
-            { label: "Admin", href: "/admin" },
+            { label: 'Home', href: '/' },
+            { label: 'Catalog', href: '/catalog' },
+            { label: 'Cart', href: '/cart' },
+            { label: 'Orders', href: '/orders' },
+            { label: 'Admin', href: '/admin' },
           ]}
-          ctaLabel="Shop Now"
+          ctaLabel="Shop now"
           ctaHref="/catalog"
           className="sticky top-0 z-50"
         />
-        {children}
-        <SiteFooter
+        <main>{children}</main>
+        <Footer
           brand="BookShop"
-          description="A modern bookstore demo with seeded content, Google OAuth, cart persistence, and admin inventory tools."
+          description="A modern seeded bookstore demo with auth, cart, and admin inventory."
           columns={[
             {
-              title: "Shop",
+              title: 'Shop',
               links: [
-                { label: "Catalog", href: "/catalog" },
-                { label: "Cart", href: "/cart" },
-                { label: "Orders", href: "/account/orders" },
+                { label: 'Catalog', href: '/catalog' },
+                { label: 'Cart', href: '/cart' },
+                { label: 'Orders', href: '/orders' },
               ],
             },
             {
-              title: "Account",
+              title: 'Company',
               links: [
-                { label: "Login", href: "/login" },
-                { label: "Register", href: "/register" },
+                { label: 'About', href: '/about' },
+                { label: 'Testimonials', href: '/testimonials' },
+                { label: 'Contact', href: '/contact' },
               ],
             },
             {
-              title: "Admin",
+              title: 'Admin',
               links: [
-                { label: "Dashboard", href: "/admin" },
-                { label: "Inventory", href: "/admin/inventory" },
-                { label: "Orders", href: "/admin/orders" },
+                { label: 'Inventory', href: '/admin/inventory' },
+                { label: 'Orders', href: '/admin/orders' },
+                { label: 'Settings', href: '/admin/settings' },
               ],
             },
           ]}
-          copyright="© 2026 BookShop. Demo storefront for seeded books."
+          copyright="© 2026 BookShop. All rights reserved."
         />
       </body>
     </html>

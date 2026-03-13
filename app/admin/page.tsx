@@ -1,46 +1,41 @@
 export const dynamic = 'force-dynamic';
 
-import AdminSidebar from "@/components/AdminSidebar"
-import AdminKpiCards from "@/components/AdminKpiCards"
-import FeaturesGrid from "@/components/FeaturesGrid"
+import ProtectedRoute from '@/components/ProtectedRoute'
+import AdminSidebar from '@/components/AdminSidebar'
+import StatsCounter from '@/components/StatsCounter'
+import FeaturesCards3D from '@/components/FeaturesCards3D'
 
-export default function AdminPage() {
+export default function AdminDashboardPage() {
   return (
-    <main className="bg-background text-foreground">
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 grid gap-6 lg:grid-cols-[260px_1fr]">
-          <AdminSidebar />
-          <div className="space-y-8">
-            <h1 className="text-4xl md:text-5xl font-bold">Admin dashboard</h1>
-            <p className="text-muted-foreground">
-              Manage inventory, featured books, and orders from a single place.
-            </p>
-            <AdminKpiCards
-              kpis={[
-                { label: "Total titles", value: "48" },
-                { label: "Low stock", value: "6" },
-                { label: "Featured", value: "8" },
-                { label: "Orders (30d)", value: "42" },
-              ]}
-            />
+    <ProtectedRoute>
+      <div className="bg-background text-foreground">
+        <section className="animate-fade-in-up py-20 md:py-28">
+          <div className="mx-auto max-w-7xl px-4 grid gap-6 lg:grid-cols-[280px_1fr]">
+            <AdminSidebar />
+            <div className="space-y-8">
+              <h1 className="text-4xl md:text-6xl font-bold">Admin dashboard</h1>
+              <StatsCounter
+                stats={[
+                  { label: 'Total SKUs', value: '48' },
+                  { label: 'Low stock', value: '7' },
+                  { label: 'Open orders', value: '3' },
+                  { label: 'Featured', value: '8' },
+                ]}
+              />
+              <FeaturesCards3D
+                title="Quick actions"
+                subtitle="Common workflows for keeping the storefront accurate."
+                features={[
+                  { icon: 'Package', title: 'Update stock', description: 'Adjust stock counts and prevent overselling.' },
+                  { icon: 'Star', title: 'Toggle featured', description: 'Promote seasonal picks on the homepage.' },
+                  { icon: 'Truck', title: 'Fulfill orders', description: 'Move orders from paid to fulfilled with notes.' },
+                  { icon: 'SearchCheck', title: 'Catalog health', description: 'Spot missing covers, prices, or metadata.' },
+                ]}
+              />
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="py-20 md:py-28 bg-muted animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <FeaturesGrid
-            headline="Quick actions"
-            subheadline="Common tasks for keeping the storefront fresh and accurate."
-            features={[
-              { icon: "Sparkles", title: "Toggle featured", description: "Promote seasonal picks on the homepage." },
-              { icon: "Boxes", title: "Adjust stock", description: "Update quantities to prevent overselling." },
-              { icon: "BadgeDollarSign", title: "Update pricing", description: "Run promotions with clear price changes." },
-              { icon: "ClipboardList", title: "Manage orders", description: "Move orders through statuses and record tracking." },
-            ]}
-          />
-        </div>
-      </section>
-    </main>
+        </section>
+      </div>
+    </ProtectedRoute>
   )
 }

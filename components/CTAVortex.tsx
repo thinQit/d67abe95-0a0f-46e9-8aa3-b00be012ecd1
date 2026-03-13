@@ -12,35 +12,31 @@ interface CTAVortexProps {
 }
 
 export default function CTAVortex({
-  headline = "Ready to save on your next order?",
-  description = "Unlock exclusive offers, early access drops, and member-only discounts today.",
+  headline = "Ready to upgrade your cart?",
+  description = "Get exclusive offers, new arrivals, and member-only discounts delivered to you first.",
   ctaLabel = "Start Shopping",
   ctaHref = "#",
   secondaryCtaLabel = "View Deals",
   secondaryCtaHref = "#",
 }: Partial<CTAVortexProps>) {
   return (
-    <section className="w-full mx-auto rounded-md h-[30rem] overflow-hidden">
+    <section className="mx-auto h-[30rem] w-full overflow-hidden rounded-md">
       <Vortex
         backgroundColor="black"
         baseHue={24}
-        className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full animate-fade-in-up"
+        className="animate-fade-in-up flex h-full w-full flex-col items-center justify-center px-2 py-4 md:px-10"
       >
-        <h2 className="text-primary-foreground text-2xl md:text-6xl font-bold text-center">{headline}</h2>
-        {description && <p className="text-primary-foreground/70 text-sm md:text-xl max-w-xl mt-6 text-center">{description}</p>}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
-          <Button
-            size="lg"
-            className="px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            asChild
-          >
+        <h2 className="text-center text-2xl font-bold text-primary-foreground md:text-6xl">{headline}</h2>
+        {description && <p className="mt-6 max-w-xl text-center text-sm text-primary-foreground/70 md:text-xl">{description}</p>}
+        <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
+          <Button size="lg" className="bg-primary px-8 py-6 text-lg text-primary-foreground transition-all duration-200 hover:scale-105" asChild>
             <a href={ctaHref}>{ctaLabel}</a>
           </Button>
           {secondaryCtaLabel && secondaryCtaHref && (
             <Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 text-lg border-border text-primary-foreground hover:bg-background/10 transition-all duration-200 hover:scale-105"
+              className="border-primary-foreground/30 px-8 py-6 text-lg text-primary-foreground transition-all duration-200 hover:scale-105"
               asChild
             >
               <a href={secondaryCtaHref}>{secondaryCtaLabel}</a>

@@ -1,7 +1,9 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { NextAuthOptions, getServerSession } from "next-auth";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { UserRole } from "@prisma/client";
+import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { db } from "./db";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -13,34 +15,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
+    session: async ({ session, user }) => {
       if (session.user) {
-        (session.user as { id?: string; role?: string }).id = user.id;
-        (session.user as { id?: string; role?: string }).role = (user as { role?: string }).role ?? "customer";
+        session.user.id = user.id;
+        session.user.role = (user as { role?: UserRole }).role ?? UserRole.CUSTOMER;
       }
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/login",
+  },
 };
 
-export async function getAuthSession() {
-  return getServerSession(authOptions);
-}
-
-export async function requireAuth() {
-  const session = await getAuthSession();
-  if (!session?.user) {
-    throw new Error("UNAUTHORIZED");
-  }
-  return session;
-}
-
-export async function requireAdmin() {
-  const session = await requireAuth();
-  const role = (session.user as { role?: string }).role;
-  if (role !== "admin") {
-    throw new Error("FORBIDDEN");
-  }
-  return session;
-}
+export const getAuthSession = () => getServerSession(authOptions);

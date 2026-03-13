@@ -1,92 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, OrderStatus } from "@prisma/client";
+import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { requireAuth } from "@/lib/auth";
-import { createOrderSchema } from "@/lib/validators";
+import { checkoutSchema } from "@/lib/validators";
 
-function decimal(v: number) {
-  return new Prisma.Decimal(v.toFixed(2));
-}
+const TAX_RATE = 0.07;
+const SHIPPING_FLAT = 4.99;
+const FREE_SHIPPING_THRESHOLD = 50;
 
 export async function GET() {
   try {
-    const session = await requireAuth();
+    const session = await getAuthSession();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const orders = await db.order.findMany({
       where: { userId: session.user.id },
-      include: { items: true },
-      orderBy: [{ createdAt: "desc" as const }],
+      include: { items: { include: { book: true } } },
+      orderBy: { createdAt: "desc" as const },
     });
 
     return NextResponse.json(orders);
   } catch (error) {
-    if (error instanceof Error && error.message === "UNAUTHORIZED") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireAuth();
-    const body = createOrderSchema.parse(await req.json());
+    const session = await getAuthSession();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const result = await db.$transaction(async (tx) => {
-      const cart = await tx.cart.findUnique({
-        where: { userId: session.user.id },
-        include: { items: { include: { book: true } } },
-      });
+    const body = await req.json();
+    const parsed = checkoutSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid payload", details: parsed.error.flatten() }, { status: 400 });
+    }
 
-      if (!cart || cart.items.length === 0) {
-        throw new Error("EMPTY_CART");
+    const cart = await db.cart.findUnique({
+      where: { userId: session.user.id },
+      include: { items: { include: { book: true } } },
+    });
+
+    if (!cart || cart.items.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    for (const item of cart.items) {
+      if (item.book.archived || item.book.stock < item.quantity) {
+        return NextResponse.json({ error: `Insufficient stock for ${item.book.title}` }, { status: 400 });
       }
+    }
 
-      for (const item of cart.items) {
-        if (item.quantity > item.book.stock) {
-          throw new Error(`OUT_OF_STOCK:${item.book.title}`);
-        }
-      }
+    const subtotalNum = cart.items.reduce((sum, i) => sum + Number(i.book.price) * i.quantity, 0);
+    const taxNum = subtotalNum * TAX_RATE;
+    const shippingNum = subtotalNum >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
+    const totalNum = subtotalNum + taxNum + shippingNum;
 
-      const subtotalNum = cart.items.reduce(
-        (sum, item) => sum + Number(item.book.price) * item.quantity,
-        0
-      );
-      const shippingNum = subtotalNum > 50 ? 0 : 4.99;
-      const taxNum = subtotalNum * 0.08;
-      const totalNum = subtotalNum + shippingNum + taxNum;
-
-      const created = await tx.order.create({
-        data: {
-          orderNumber: `BS-${Date.now()}`,
-          userId: session.user.id,
-          status: "PENDING",
-          subtotal: decimal(subtotalNum),
-          tax: decimal(taxNum),
-          shipping: decimal(shippingNum),
-          total: decimal(totalNum),
-          shippingName: body.shippingName,
-          shippingEmail: body.shippingEmail,
-          shippingAddress1: body.shippingAddress1,
-          shippingAddress2: body.shippingAddress2,
-          shippingCity: body.shippingCity,
-          shippingState: body.shippingState,
-          shippingPostal: body.shippingPostal,
-          shippingCountry: body.shippingCountry,
-          items: {
-            create: cart.items.map((item) => ({
-              bookId: item.bookId,
-              quantity: item.quantity,
-              unitPrice: item.book.price,
-              title: item.book.title,
-              author: item.book.author,
-              genre: item.book.genre,
-            })),
-          },
-        },
-        include: { items: true },
-      });
-
+    const order = await db.$transaction(async (tx) => {
       for (const item of cart.items) {
         await tx.book.update({
           where: { id: item.bookId },
@@ -94,24 +64,34 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+      const created = await tx.order.create({
+        data: {
+          orderNumber: `BS-${Date.now()}`,
+          userId: session.user.id,
+          status: OrderStatus.pending,
+          subtotal: new Prisma.Decimal(subtotalNum.toFixed(2)),
+          tax: new Prisma.Decimal(taxNum.toFixed(2)),
+          shipping: new Prisma.Decimal(shippingNum.toFixed(2)),
+          total: new Prisma.Decimal(totalNum.toFixed(2)),
+          ...parsed.data,
+          items: {
+            create: cart.items.map((item) => ({
+              bookId: item.bookId,
+              quantity: item.quantity,
+              unitPrice: item.book.price,
+              lineTotal: new Prisma.Decimal((Number(item.book.price) * item.quantity).toFixed(2)),
+            })),
+          },
+        },
+        include: { items: true },
+      });
 
+      await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
       return created;
     });
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "UNAUTHORIZED") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-      if (error.message === "EMPTY_CART") {
-        return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
-      }
-      if (error.message.startsWith("OUT_OF_STOCK")) {
-        return NextResponse.json({ error: "One or more items are out of stock" }, { status: 400 });
-      }
-    }
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 }

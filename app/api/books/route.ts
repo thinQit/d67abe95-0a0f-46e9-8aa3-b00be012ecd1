@@ -1,46 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { bookListQuerySchema } from "@/lib/validators";
+import { booksQuerySchema } from "@/lib/validators";
 
 export async function GET(req: NextRequest) {
   try {
-    const parsed = bookListQuerySchema.safeParse(Object.fromEntries(req.nextUrl.searchParams.entries()));
+    const params = Object.fromEntries(req.nextUrl.searchParams.entries());
+    const parsed = booksQuerySchema.safeParse(params);
+
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json({ error: "Invalid query", details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { search, genre, featured, inStock, sort, page, pageSize } = parsed.data;
+    const { q, genre, featured, inStock, sort, page, pageSize } = parsed.data;
 
-    const where = {
+    const where: Prisma.BookWhereInput = {
       archived: false,
-      ...(search
+      ...(q
         ? {
             OR: [
-              { title: { contains: search, mode: "insensitive" as const } },
-              { author: { contains: search, mode: "insensitive" as const } },
+              { title: { contains: q, mode: "insensitive" } },
+              { author: { contains: q, mode: "insensitive" } },
+              { isbn13: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
-      ...(genre ? { genre: { name: { equals: genre, mode: "insensitive" as const } } } : {}),
+      ...(genre ? { genre } : {}),
       ...(typeof featured === "boolean" ? { featured } : {}),
       ...(inStock ? { stock: { gt: 0 } } : {}),
     };
 
-    const orderBy =
-      sort === "price_asc"
-        ? { price: "asc" as const }
-        : sort === "price_desc"
-        ? { price: "desc" as const }
-        : sort === "rating_desc"
-        ? { rating: "desc" as const }
-        : sort === "created_desc"
+    const orderBy: Prisma.BookOrderByWithRelationInput =
+      sort === "created_desc"
         ? { createdAt: "desc" as const }
-        : { featured: "desc" as const };
+        : sort === "price_asc"
+          ? { price: "asc" as const }
+          : sort === "price_desc"
+            ? { price: "desc" as const }
+            : sort === "rating_desc"
+              ? { rating: "desc" as const }
+              : { featured: "desc" as const };
 
     const [items, total] = await Promise.all([
       db.book.findMany({
         where,
-        include: { genre: true },
         orderBy,
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -48,8 +51,14 @@ export async function GET(req: NextRequest) {
       db.book.count({ where }),
     ]);
 
-    return NextResponse.json({ items, total, page, pageSize });
-  } catch {
+    return NextResponse.json({
+      items,
+      page,
+      pageSize,
+      total,
+      hasMore: page * pageSize < total,
+    });
+  } catch (error) {
     return NextResponse.json({ error: "Failed to fetch books" }, { status: 500 });
   }
 }

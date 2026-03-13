@@ -1,236 +1,195 @@
 export const dynamic = 'force-dynamic';
 
-import HeroSpotlight from "@/components/HeroSpotlight"
-import CategoryNav from "@/components/CategoryNav"
-import BookGrid from "@/components/BookGrid"
-import TrustBadges from "@/components/TrustBadges"
-import TestimonialsGrid from "@/components/TestimonialsGrid"
-import NewsletterForm from "@/components/NewsletterForm"
-import FeaturesGrid from "@/components/FeaturesGrid"
-import StatsCounter from "@/components/StatsCounter"
-import GalleryMasonry from "@/components/GalleryMasonry"
-import SectionReveal from "@/components/SectionReveal"
+import HeroSpotlight from '@/components/HeroSpotlight'
+import CategoryNav from '@/components/CategoryNav'
+import ProductGrid from '@/components/ProductGrid'
+import TrustBadges from '@/components/TrustBadges'
+import TestimonialsGrid from '@/components/TestimonialsGrid'
+import NewsletterForm from '@/components/NewsletterForm'
+import StatsCounter from '@/components/StatsCounter'
+import GalleryMasonry from '@/components/GalleryMasonry'
+import CTAVortex from '@/components/CTAVortex'
 
 export default function HomePage() {
   return (
-    <main className="bg-background text-foreground">
-      <section
-        className="relative min-h-[80vh] bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url(https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577110/site-images/ecommerce/17485351.jpg)",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10">
-          <HeroSpotlight
-            title="Find your next favorite book—fast, curated, and in stock."
-            subtitle="Browse seeded bestsellers, filter by genre, and build your cart in seconds. Sign in with Google to save your cart across devices."
-            primaryCta={{ label: "Shop the Catalog", href: "/catalog" }}
-            secondaryCta={{ label: "Explore Genres", href: "/catalog?genre=Fantasy" }}
-          />
-        </div>
+    <div className="bg-background text-foreground">
+      <section className="animate-fade-in-up">
+        <HeroSpotlight
+          title="Find your next great read—fast."
+          subtitle="Browse curated, seeded titles across Fiction, Fantasy, Business, and more. Save your cart, sign in with Google, and check out when you’re ready."
+          primaryCta={{ label: 'Shop the catalog', href: '/catalog' }}
+          secondaryCta={{ label: 'Explore genres', href: '/catalog?genre=Fiction' }}
+        />
       </section>
 
-      <div className="animate-fade-in-up">
-        <SectionReveal>
+      <section className="animate-fade-in-up py-20 md:py-28 bg-muted/40">
+        <div className="mx-auto max-w-7xl px-4">
           <StatsCounter
             stats={[
-              { value: "12", label: "Genres" },
-              { value: "48+", label: "Seeded titles" },
-              { value: "2–4 days", label: "Avg. ship time" },
+              { label: 'Seeded titles', value: '48' },
+              { label: 'Genres', value: '10' },
+              { label: 'Avg. rating', value: '4.6/5' },
             ]}
-            bgColor="bg-muted"
+            bgColor="bg-card"
           />
-        </SectionReveal>
-      </div>
+        </div>
+      </section>
 
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <section className="animate-fade-in-up py-20 md:py-28 bg-background">
+        <div className="mx-auto max-w-7xl px-4">
           <CategoryNav
             headline="Shop by genre"
-            subheadline="Jump into the shelves people browse most—then refine with filters."
-            primaryCta={{ label: "View all genres", href: "/catalog" }}
-            secondaryCta={{ label: "See featured", href: "/catalog?featured=true" }}
+            subheadline="Jump straight into what you love—then refine with filters and search."
             categories={[
-              { name: "Fantasy", href: "/catalog?genre=Fantasy", countLabel: "8 titles" },
-              { name: "Mystery & Thriller", href: "/catalog?genre=Mystery", countLabel: "7 titles" },
-              { name: "Romance", href: "/catalog?genre=Romance", countLabel: "6 titles" },
-              { name: "Science Fiction", href: "/catalog?genre=Sci-Fi", countLabel: "6 titles" },
-              { name: "Nonfiction", href: "/catalog?genre=Nonfiction", countLabel: "7 titles" },
-              { name: "Technology", href: "/catalog?genre=Technology", countLabel: "6 titles" },
+              { name: 'Fiction', href: '/catalog?genre=Fiction', count: 10 },
+              { name: 'Fantasy', href: '/catalog?genre=Fantasy', count: 6 },
+              { name: 'Mystery & Thriller', href: '/catalog?genre=Mystery%20%26%20Thriller', count: 5 },
+              { name: 'Business', href: '/catalog?genre=Business', count: 6 },
+              { name: 'Self-Improvement', href: '/catalog?genre=Self-Improvement', count: 5 },
+              { name: 'Technology', href: '/catalog?genre=Technology', count: 6 },
+              { name: 'History', href: '/catalog?genre=History', count: 4 },
+              { name: 'Biography', href: '/catalog?genre=Biography', count: 6 },
             ]}
+            primaryCta={{ label: 'View all genres', href: '/catalog' }}
+            secondaryCta={{ label: 'See featured', href: '/catalog?featured=true' }}
           />
         </div>
       </section>
 
-      <section className="py-20 md:py-28 animate-fade-in-up bg-card">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <BookGrid
-            headline="Featured books, ready to ship"
-            subheadline="Hand-picked from the seeded catalog—great covers, great reviews, and reliable stock."
-            books={[
+      <section className="animate-fade-in-up py-20 md:py-28 bg-muted/40">
+        <div className="mx-auto max-w-7xl px-4">
+          <ProductGrid
+            headline="Featured books readers keep recommending"
+            subheadline="A rotating set of seeded bestsellers and staff picks—always in stock (until it isn’t)."
+            products={[
               {
-                title: "The Midnight Archive",
-                author: "Elena Ward",
-                price: 19.99,
-                rating: 4.7,
-                reviewCount: 128,
-                genre: "Fantasy",
-                stockLabel: "In stock",
-                href: "/book/the-midnight-archive",
-                imageUrl:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577111/site-images/ecommerce/3767397.jpg",
-                tag: "Bestseller",
-              },
-              {
-                title: "Harbor of Secrets",
-                author: "Mina Patel",
-                price: 16.5,
-                rating: 4.5,
-                reviewCount: 94,
-                genre: "Mystery",
-                stockLabel: "In stock",
-                href: "/book/harbor-of-secrets",
-                imageUrl:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577164/site-images/ecommerce/11952301.jpg",
-                tag: "New",
-              },
-              {
-                title: "Practical TypeScript",
-                author: "Noah Kim",
-                price: 34,
+                slug: 'atomic-habits',
+                title: 'Atomic Habits',
+                author: 'James Clear',
+                genre: 'Self-Improvement',
+                price: 18.99,
+                compareAtPrice: 22.99,
                 rating: 4.8,
-                reviewCount: 211,
-                genre: "Technology",
-                stockLabel: "Low stock",
-                href: "/book/practical-typescript",
+                reviewCount: 3124,
+                badge: 'Bestseller',
                 imageUrl:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577109/site-images/ecommerce/10330112.jpg",
-                tag: "Staff pick",
+                  'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577111/site-images/ecommerce/3767397.jpg',
               },
               {
-                title: "The Quiet Equation",
-                author: "Sofia Laurent",
-                price: 22,
+                slug: 'dune',
+                title: 'Dune',
+                author: 'Frank Herbert',
+                genre: 'Fantasy',
+                price: 16.5,
+                compareAtPrice: 19,
+                rating: 4.7,
+                reviewCount: 2450,
+                badge: 'Epic',
+                imageUrl:
+                  'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577129/site-images/ecommerce/16675635.jpg',
+              },
+              {
+                slug: 'the-pragmatic-programmer',
+                title: 'The Pragmatic Programmer',
+                author: 'Andrew Hunt, David Thomas',
+                genre: 'Technology',
+                price: 39,
+                compareAtPrice: 45,
+                rating: 4.9,
+                reviewCount: 980,
+                badge: 'Classic',
+                imageUrl:
+                  'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577164/site-images/ecommerce/11952301.jpg',
+              },
+              {
+                slug: 'educated',
+                title: 'Educated',
+                author: 'Tara Westover',
+                genre: 'Biography',
+                price: 14.99,
+                compareAtPrice: 18.99,
                 rating: 4.6,
-                reviewCount: 76,
-                genre: "Sci-Fi",
-                stockLabel: "In stock",
-                href: "/book/the-quiet-equation",
+                reviewCount: 2105,
+                badge: 'Staff pick',
                 imageUrl:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577147/site-images/ecommerce/35541612.jpg",
-                tag: "Featured",
+                  'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577126/site-images/ecommerce/259200.jpg',
               },
             ]}
           />
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-muted animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <section className="animate-fade-in-up py-20 md:py-28 bg-background">
+        <div className="mx-auto max-w-7xl px-4">
           <TrustBadges
-            headline="A checkout flow that feels safe and effortless"
-            subheadline="Sign in with Google, keep your cart synced, and track orders from your account."
+            headline="Checkout-ready, secure, and built for speed"
+            subheadline="Google sign-in, persistent carts, and an admin inventory workflow—so the store stays accurate."
             badges={[
-              { title: "Google OAuth login", description: "One-tap sign-in with secure account linking." },
-              { title: "Cart persistence", description: "Your cart follows you across sessions and devices." },
-              { title: "Order history", description: "See past orders, statuses, and totals in your account." },
-              { title: "Stock-aware catalog", description: "Add-to-cart respects inventory and prevents oversells." },
+              { title: 'Google OAuth', description: 'One-tap sign-in via NextAuth with Google provider.' },
+              { title: 'Persistent cart', description: 'Cart saved to your account when signed in; local fallback when signed out.' },
+              { title: 'Inventory-aware', description: 'Stock levels enforced on add-to-cart and checkout flows.' },
+              { title: 'Order tracking', description: 'Order history for customers and order management for admins.' },
             ]}
-            primaryCta={{ label: "Sign in with Google", href: "/login" }}
-            secondaryCta={{ label: "View your cart", href: "/cart" }}
           />
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-card animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <section className="animate-fade-in-up py-20 md:py-28 bg-muted/40">
+        <div className="mx-auto max-w-7xl px-4">
           <TestimonialsGrid
-            headline="Readers love the fast browsing experience"
-            subheadline="Realistic seeded reviews to showcase layout density, ratings, and trust signals."
+            headline="Readers love the clean browsing experience"
+            subheadline="Seeded reviews to showcase layout, typography, and trust signals."
             testimonials={[
-              {
-                name: "Avery Chen",
-                role: "Fantasy reader",
-                quote: "The genre filters are spot-on. I found three new authors in under five minutes.",
-                rating: 5,
-                avatar:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577321/site-images/team-people/1181622.jpg",
-              },
-              {
-                name: "Jordan Reyes",
-                role: "Software engineer",
-                quote:
-                  "Search is fast, product pages are clean, and the cart stayed saved after I signed in with Google.",
-                rating: 5,
-                avatar:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577358/site-images/team-people/1181401.jpg",
-              },
-              {
-                name: "Samira Khan",
-                role: "Nonfiction fan",
-                quote: "Love the stock labels—no surprises at checkout. The featured shelf is genuinely curated.",
-                rating: 4,
-                avatar:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577335/site-images/team-people/1181734.jpg",
-              },
-              {
-                name: "Morgan Blake",
-                role: "Mystery & thriller reader",
-                quote: "The product detail page makes it easy to compare editions and see what’s in stock.",
-                rating: 5,
-                avatar:
-                  "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577327/site-images/team-people/12899112.jpg",
-              },
+              { name: 'Maya R.', title: 'Avid reader', quote: 'The genre filters are spot on. I found three new favorites in under five minutes.' },
+              { name: 'Daniel K.', title: 'Tech lead', quote: 'Fast search, clean product pages, and the cart just stays put across devices after Google sign-in.' },
+              { name: 'Sofia L.', title: 'Book club organizer', quote: 'Featured picks make it easy to choose our monthly read. Love the staff pick badges.' },
+              { name: 'Ethan P.', title: 'Busy parent', quote: 'Simple checkout-ready flow and clear stock messaging—no surprises at the end.' },
             ]}
           />
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-muted animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <section className="animate-fade-in-up py-20 md:py-28 bg-background">
+        <div className="mx-auto max-w-7xl px-4">
           <GalleryMasonry
-            headline="Inside BookShop"
-            subheadline="Curated visuals from our reading-first storefront experience."
+            headline="Inside the BookShop experience"
+            subheadline="A polished, visual-first browsing and checkout journey."
             images={[
-              {
-                url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577110/site-images/ecommerce/17485350.jpg",
-                alt: "Books on shelf",
-                caption: "Fresh arrivals weekly",
-              },
-              {
-                url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577152/site-images/ecommerce/11952304.jpg",
-                alt: "Open book closeup",
-                caption: "Curated editions",
-              },
-              {
-                url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577158/site-images/ecommerce/10330120.jpg",
-                alt: "Reader browsing catalog",
-                caption: "Easy discovery",
-              },
-              {
-                url: "https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577128/site-images/ecommerce/16675634.jpg",
-                alt: "Stack of novels",
-                caption: "Genre picks",
-              },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577158/site-images/ecommerce/29502357.jpg', alt: 'Book browsing' },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577106/site-images/ecommerce/15195243.jpg', alt: 'Reading corner' },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577154/site-images/ecommerce/10330119.jpg', alt: 'Book cart' },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577110/site-images/ecommerce/17485350.jpg', alt: 'Shelf detail' },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577152/site-images/ecommerce/11952304.jpg', alt: 'Checkout process' },
+              { url: 'https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577132/site-images/ecommerce/16675631.jpg', alt: 'New arrivals display' },
             ]}
           />
         </div>
       </section>
 
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <section className="animate-fade-in-up py-20 md:py-28 bg-muted/40">
+        <div className="mx-auto max-w-7xl px-4">
           <NewsletterForm
-            headline="Get a monthly shelf—new arrivals and staff picks"
-            subheadline="One email per month. No spam. Early access to featured drops from the seeded catalog as it grows."
+            headline="Get monthly staff picks and new arrivals"
+            subheadline="One email a month. No spam. Unsubscribe anytime."
             placeholder="you@domain.com"
-            finePrint="By subscribing, you agree to receive BookShop emails. Unsubscribe anytime."
-            primaryCta={{ label: "Subscribe", href: "/#newsletter" }}
-            secondaryCta={{ label: "Browse new arrivals", href: "/catalog?sort=created_desc" }}
+            ctaLabel="Subscribe"
+            privacyNote="We’ll only use your email to send BookShop updates."
           />
         </div>
       </section>
-    </main>
+
+      <section className="animate-fade-in-up py-20 md:py-28 bg-background">
+        <div className="mx-auto max-w-7xl px-4">
+          <CTAVortex
+            title="Ready to start your next chapter?"
+            subtitle="Search, filter, and add your next favorite reads in minutes."
+            ctaLabel="Browse all books"
+            ctaHref="/catalog"
+            secondaryCtaLabel="View cart"
+            secondaryCtaHref="/cart"
+          />
+        </div>
+      </section>
+    </div>
   )
 }

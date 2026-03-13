@@ -1,56 +1,38 @@
 export const dynamic = 'force-dynamic';
 
-import BookCard from "@/components/BookCard"
-import AddToCartButton from "@/components/AddToCartButton"
-import RatingStars from "@/components/RatingStars"
-import Price from "@/components/Price"
-import StockBadge from "@/components/StockBadge"
-import FeaturesGrid from "@/components/FeaturesGrid"
-import BookGrid from "@/components/BookGrid"
+import ProductGallery from '@/components/ProductGallery'
+import PriceTag from '@/components/PriceTag'
+import RatingStars from '@/components/RatingStars'
+import ProductGrid from '@/components/ProductGrid'
 
-export default function ProductDetailPage() {
+export default function BookDetailPage() {
   return (
-    <main className="bg-background text-foreground">
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 grid gap-8 lg:grid-cols-2">
-          <BookCard />
+    <div className="bg-background text-foreground">
+      <section className="animate-fade-in-up py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4 grid gap-8 md:grid-cols-2">
+          <ProductGallery
+            title="Book details"
+            imageUrl="https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577128/site-images/ecommerce/32831065.jpg"
+          />
           <div className="space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold">Book details</h1>
-            <p className="text-muted-foreground">
-              Cover-first layout with clear pricing, rating, stock, and a frictionless add-to-cart.
-            </p>
-            <RatingStars rating={4.7} reviewCount={128} />
-            <Price value={19.99} />
-            <StockBadge label="In stock" />
-            <div id="add-to-cart">
-              <AddToCartButton label="Add to cart" className="transition-all duration-200 hover:scale-105" />
-            </div>
+            <h1 className="text-3xl md:text-5xl font-bold">Book details</h1>
+            <p className="text-muted-foreground">Cover, synopsis, ratings, and stock-aware purchasing.</p>
+            <PriceTag price={18.99} compareAtPrice={22.99} currency="USD" />
+            <RatingStars rating={4.8} count={3124} />
           </div>
         </div>
       </section>
-
-      <section className="py-20 md:py-28 bg-muted animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <FeaturesGrid
-            headline="What you’ll get"
-            subheadline="A clear breakdown for confident buying decisions."
-            features={[
-              { icon: "BookOpen", title: "Overview", description: "Story/summary, key themes, and audience fit." },
-              { icon: "FileText", title: "Details", description: "ISBN, format, pages, publisher, and publication date." },
-              { icon: "Star", title: "Reviews", description: "Rating distribution and top reader highlights." },
-            ]}
-          />
+      <section className="animate-fade-in-up py-20 md:py-28 bg-muted/40">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="text-3xl font-bold">What you’ll get</h2>
+          <p className="mt-3 text-muted-foreground">Clear details for confident buying decisions.</p>
         </div>
       </section>
-
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <BookGrid
-            headline="More in this genre"
-            subheadline="Keep browsing with genre-matched recommendations from the seeded catalog."
-          />
+      <section className="animate-fade-in-up py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4">
+          <ProductGrid headline="You might also like" subheadline="More titles from the same genre and similar ratings." />
         </div>
       </section>
-    </main>
+    </div>
   )
 }

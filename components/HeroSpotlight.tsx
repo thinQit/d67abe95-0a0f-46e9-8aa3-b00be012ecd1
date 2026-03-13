@@ -11,38 +11,34 @@ interface HeroSpotlightProps {
 }
 
 export default function HeroSpotlight({
-  headline = "Flash Deals on Everyday Favorites",
-  subheadline = "Discover trending products, exclusive bundles, and limited-time offers with fast shipping and secure checkout.",
+  headline = "Flash Deals on Everyday Essentials",
+  subheadline = "Discover trusted products, fast shipping, and unbeatable value—all in one clean shopping experience.",
   primaryCta = { label: "Shop Best Sellers", href: "#" },
   secondaryCta = { label: "Browse Categories", href: "#" },
 }: Partial<HeroSpotlightProps>) {
   var words = headline.split(" ").map(function (word) {
     return { text: word };
   });
-
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col items-center justify-center overflow-hidden rounded-md bg-foreground antialiased">
-      <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#f59e0b" />
-      <div className="absolute inset-0 opacity-20 bg-[url('https://res.cloudinary.com/dwc294mzm/image/upload/c_fill,w_1200,h_800,g_auto/v1771577712/site-images/hero-backgrounds/12981878.jpg')] bg-cover bg-center" />
-      <div className="relative z-10 mx-auto w-full max-w-4xl p-4 pt-20 md:pt-0 text-center animate-fade-in-up">
+    <section className="relative flex min-h-[600px] flex-col items-center justify-center overflow-hidden rounded-md bg-background antialiased md:min-h-[700px]">
+      <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#E63946" />
+      <div className="absolute inset-0 bg-muted/30" />
+      <div className="animate-fade-in-up relative z-10 mx-auto w-full max-w-4xl p-4 pt-20 text-center md:pt-0">
         <TypewriterEffect
           words={words}
-          className="text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-primary-foreground to-primary-foreground/70"
+          className="text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl text-foreground"
+          cursorClassName="bg-primary"
         />
-        <p className="mx-auto mt-6 max-w-2xl text-base text-primary-foreground/80 md:text-lg">{subheadline}</p>
+        <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">{subheadline}</p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button
-            size="lg"
-            className="px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            asChild
-          >
-            <a href={primaryCta?.href || "#"}>{primaryCta?.label || ""}</a>
+          <Button size="lg" className="bg-primary px-8 py-6 text-lg text-primary-foreground transition-all duration-200 hover:scale-105" asChild>
+            <a href={primaryCta?.href}>{primaryCta?.label}</a>
           </Button>
           {secondaryCta && (
             <Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 text-lg border-border text-primary-foreground hover:bg-background/10 transition-all duration-200 hover:scale-105"
+              className="border-border px-8 py-6 text-lg text-foreground transition-all duration-200 hover:scale-105"
               asChild
             >
               <a href={secondaryCta.href}>{secondaryCta.label}</a>

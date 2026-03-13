@@ -1,44 +1,30 @@
 "use client";
 
-import { Star } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Star } from "lucide-react";
 
 interface RatingStarsProps {
-  rating?: number
-  reviewCount?: number
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
+  rating: number;
+  count?: number;
 }
 
 export default function RatingStars({
-  rating = 4.5,
-  reviewCount = 0,
-  size = 'sm',
-  className = '',
-}: Partial<RatingStarsProps>) {
-  const fullStars = Math.floor(rating)
-  const hasHalf = rating - fullStars >= 0.5
-
-  const sizeClass =
-    size === 'lg' ? 'h-5 w-5' : size === 'md' ? 'h-4 w-4' : 'h-3.5 w-3.5'
-
+  rating = 5,
+  count,
+}: RatingStarsProps) {
+  const rounded = Math.round(rating * 2) / 2;
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <div className="flex items-center gap-0.5">
-        {[0, 1, 2, 3, 4].map((i) => {
-          const filled = i < fullStars || (i === fullStars && hasHalf)
-          return (
-            <Star
-              key={i}
-              className={cn(
-                sizeClass,
-                filled ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'
-              )}
-            />
-          )
-        })}
+    <div className="flex items-center gap-2" aria-label={`Rated ${rating} out of 5`}>
+      <div className="flex">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            fill={i + 1 <= rounded ? "#8B5CF6" : "none"}
+            className={i + 1 <= rounded ? "w-5 h-5 text-accent" : "w-5 h-5 text-muted-foreground"}
+            aria-hidden="true"
+          />
+        ))}
       </div>
-      <span className="text-xs text-muted-foreground">({reviewCount})</span>
+      <span className="text-sm text-muted-foreground">{rating}{count && <> · {count} reviews</>}</span>
     </div>
-  )
+  );
 }

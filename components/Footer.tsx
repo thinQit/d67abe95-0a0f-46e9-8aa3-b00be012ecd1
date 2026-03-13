@@ -1,21 +1,65 @@
 "use client";
 
-import Link from 'next/link'
+import Link from "next/link";
 
-interface FooterProps {
-  brand?: string
+interface FooterColumn {
+  title: string;
+  links: { label: string; href: string }[];
 }
 
-export default function Footer({ brand = 'BookShop' }: Partial<FooterProps>) {
+interface FooterProps {
+  brand: string;
+  description: string;
+  columns: FooterColumn[];
+  copyright: string;
+}
+
+export default function Footer({
+  brand,
+  description,
+  columns,
+  copyright,
+}: FooterProps) {
   return (
-    <footer className="mt-16 border-t bg-[#F8F9FA]">
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:grid-cols-4">
-        <div><p className="font-semibold">{brand}</p><p className="text-sm text-muted-foreground">Your trusted online bookstore.</p></div>
-        <div><p className="mb-2 font-medium">Shop</p><div className="space-y-1 text-sm"><Link href="/catalog">All Books</Link></div></div>
-        <div><p className="mb-2 font-medium">Account</p><div className="space-y-1 text-sm"><Link href="/login">Login</Link></div></div>
-        <div><p className="mb-2 font-medium">Help</p><div className="space-y-1 text-sm"><Link href="/support">Support</Link></div></div>
+    <footer className="bg-card border-t py-16 px-4 text-foreground">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
+          <div>
+            <Link href="/" className="font-bold text-2xl md:text-3xl gradient-text">
+              {brand}
+            </Link>
+            <p className="mt-4 max-w-xs text-muted-foreground">{description}</p>
+          </div>
+          <div className="flex flex-wrap gap-8 sm:gap-16">
+            {columns.map((col) => (
+              <nav key={col.title} aria-label={col.title} className="min-w-[120px]">
+                <h3 className="font-semibold text-lg">{col.title}</h3>
+                <ul className="mt-4 flex flex-col gap-2">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-muted-foreground hover:text-primary font-medium transition"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
+          </div>
+        </div>
+        <div className="mt-12 border-t border-border pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-muted-foreground">
+          <div>
+            {copyright}
+          </div>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-primary">Privacy</Link>
+            <Link href="/terms" className="hover:text-primary">Terms</Link>
+          </div>
+        </div>
       </div>
-      <div className="border-t py-4 text-center text-xs text-muted-foreground">© 2026 {brand}. All rights reserved.</div>
     </footer>
-  )
+  );
 }

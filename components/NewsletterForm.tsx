@@ -1,77 +1,64 @@
 "use client";
-
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { CheckCircle, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface NewsletterFormProps {
   headline: string;
   subheadline?: string;
   placeholder?: string;
-  finePrint?: string;
-  primaryCta?: { label: string; href: string };
-  secondaryCta?: { label: string; href: string };
+  ctaLabel?: string;
+  privacyNote?: string;
 }
 
 export default function NewsletterForm({
-  headline = "Get a monthly shelf—new arrivals and staff picks",
-  subheadline = "Sign up and receive one curated email per month. No spam.",
+  headline = "Stay in the know",
+  subheadline = "",
   placeholder = "you@domain.com",
-  finePrint = "By subscribing, you agree to receive BookShop emails. Unsubscribe anytime.",
-  primaryCta = { label: "Subscribe", href: "/#newsletter" },
-  secondaryCta = { label: "Browse new arrivals", href: "/catalog?sort=created_desc" },
+  ctaLabel = "Subscribe",
+  privacyNote = "",
 }: Partial<NewsletterFormProps>) {
-  const [submitted, setSubmitted] = useState(false);
   const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  // Note: Replace with true backend later
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // real implementation would call API
     setSubmitted(true);
+    setEmail("");
+    setTimeout(() => setSubmitted(false), 2000);
   }
 
   return (
-    <section className="max-w-2xl mx-auto p-8 rounded-xl shadow bg-card border">
-      <div className="text-center mb-5">
-        <h2 className="text-2xl md:text-3xl font-bold">{headline}</h2>
-        {subheadline && <p className="mt-2 text-base text-muted-foreground">{subheadline}</p>}
-      </div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col items-center gap-3 md:flex-row md:gap-2">
+    <section className="py-16 md:py-24">
+      <div className="max-w-3xl mx-auto px-4 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-2">{headline}</h2>
+        {subheadline && (
+          <p className="mb-6 text-muted-foreground text-lg">{subheadline}</p>
+        )}
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <input
             type="email"
-            placeholder={placeholder}
             required
-            className={cn(
-              "w-full md:w-auto px-4 py-2 rounded-md border border-border text-base shadow-sm focus:ring-1 focus:ring-primary outline-none"
-            )}
+            placeholder={placeholder}
             value={email}
+            aria-label="Email address"
             onChange={(e) => setEmail(e.target.value)}
+            className="w-full sm:w-auto px-4 py-3 rounded-lg border border-border bg-muted text-base outline-none focus:ring-2 focus:ring-primary transition"
             disabled={submitted}
-            aria-label="Email"
           />
-          <button
-            disabled={submitted || !email}
-            type="submit"
-            className={cn(
-              "rounded-lg bg-primary px-6 py-2 text-primary-foreground font-semibold text-base shadow-sm hover:bg-primary/90 transition-all",
-              submitted ? "opacity-60 cursor-not-allowed" : ""
+          <Button type="submit" size="lg" className="px-7 py-3" disabled={submitted || !email}>
+            {submitted ? (
+              <span className="flex items-center gap-2"><CheckCircle size={20} /> Subscribed</span>
+            ) : (
+              <span className="flex items-center gap-2"><Send size={20} /> {ctaLabel}</span>
             )}
-          >
-            {submitted ? "Subscribed" : primaryCta?.label ?? "Subscribe"}
-          </button>
-        </div>
-        <div className="flex flex-col gap-2 items-center mt-2">
-          {secondaryCta && (
-            <a
-              href={secondaryCta.href}
-              className="text-sm text-primary hover:underline mt-2"
-            >
-              {secondaryCta.label}
-            </a>
-          )}
-          {finePrint && <span className="text-xs text-muted-foreground">{finePrint}</span>}
-        </div>
-      </form>
+          </Button>
+        </form>
+        {privacyNote && (
+          <p className="mt-3 text-xs text-muted-foreground">{privacyNote}</p>
+        )}
+      </div>
     </section>
   );
 }

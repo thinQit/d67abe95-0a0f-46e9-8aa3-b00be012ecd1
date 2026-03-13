@@ -1,27 +1,26 @@
 export const dynamic = 'force-dynamic';
 
-import AdminSidebar from "@/components/AdminSidebar"
-import AdminOrderTable from "@/components/AdminOrderTable"
+import ProtectedRoute from '@/components/ProtectedRoute'
+import AdminSidebar from '@/components/AdminSidebar'
+import AdminTable from '@/components/AdminTable'
 
 export default function AdminOrdersPage() {
   return (
-    <main className="bg-background text-foreground">
-      <section className="py-20 md:py-28 animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 grid gap-6 lg:grid-cols-[260px_1fr]">
-          <AdminSidebar />
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold">Order management</h1>
-            <p className="text-muted-foreground">
-              Review orders created from checkout-ready flows and update statuses.
-            </p>
+    <ProtectedRoute>
+      <div className="bg-background text-foreground">
+        <section className="animate-fade-in-up py-20 md:py-28">
+          <div className="mx-auto max-w-7xl px-4 grid gap-6 lg:grid-cols-[280px_1fr]">
+            <AdminSidebar />
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold">Order management</h1>
+              <p className="text-muted-foreground">
+                Review, update status, and fulfill orders created from checkout-ready flows.
+              </p>
+              <AdminTable title="Orders" />
+            </div>
           </div>
-        </div>
-      </section>
-      <section className="py-20 md:py-28 bg-card animate-fade-in-up">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <AdminOrderTable />
-        </div>
-      </section>
-    </main>
+        </section>
+      </div>
+    </ProtectedRoute>
   )
 }
